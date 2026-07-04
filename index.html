@@ -14,7 +14,7 @@
 
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; background: #0a0a0a; font-family: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', sans-serif; overscroll-behavior: none; height: 100%; overflow: hidden; }
+  html, body { margin: 0; padding: 0; background: #0a0a0a; font-family: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', sans-serif; overscroll-behavior: none; height: 100%; overflow: hidden; position: fixed; inset: 0; width: 100%; }
   button, input { font-family: inherit; touch-action: manipulation; }
   button { cursor: pointer; border: none; background: none; padding: 0; }
 
@@ -62,10 +62,11 @@
     padding: calc(16px + env(safe-area-inset-top, 0px)) 12px calc(70px + env(safe-area-inset-bottom, 0px));
   }
   .bottom-nav {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    position: fixed; left: 0; right: 0; bottom: -20px; z-index: 40;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 -4px 16px rgba(0,0,0,0.45);
     border-top: 1px solid rgba(0,0,0,0.4);
+    padding-bottom: 20px;
   }
   .bottom-nav-inner {
     width: 100%; max-width: 420px; display: flex; align-items: center; justify-content: space-between;
