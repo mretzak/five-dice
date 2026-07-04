@@ -14,7 +14,7 @@
 
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; background: #0a0a0a; font-family: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', sans-serif; overscroll-behavior: none; height: 100%; overflow: hidden; position: fixed; inset: 0; width: 100%; }
+  html, body { margin: 0; padding: 0; background: #0a0a0a; font-family: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', sans-serif; overscroll-behavior: none; }
   button, input { font-family: inherit; touch-action: manipulation; }
   button { cursor: pointer; border: none; background: none; padding: 0; }
 
@@ -49,16 +49,12 @@
   }
 
   .card-shell {
-    width: 100%; max-width: 420px; max-height: 100%; border-radius: 16px; overflow-x: hidden; overflow-y: auto;
-    -webkit-overflow-scrolling: touch; overscroll-behavior: none; position: relative;
+    width: 100%; max-width: 420px; border-radius: 16px; overflow: hidden; position: relative;
     box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid #2a1408;
   }
-  .card-shell-game {
-    flex: 1; min-height: 0; display: flex; flex-direction: column;
-  }
   .page {
-    height: 100vh; height: 100dvh; height: var(--app-height, 100dvh); width: 100%; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; box-sizing: border-box; overflow: hidden;
+    min-height: 100vh; width: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; box-sizing: border-box;
     padding: calc(16px + env(safe-area-inset-top, 0px)) 12px calc(16px + env(safe-area-inset-bottom, 0px));
   }
   .bottom-nav {
@@ -72,13 +68,45 @@
   }
   .scorecard-box {
     overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
-    flex: 1; min-height: 0; overscroll-behavior: none;
+    max-height: 42vh; overscroll-behavior: contain;
   }
-  .felt-body-game {
-    display: flex; flex-direction: column; flex: 1; min-height: 0;
+
+  /* Full-height layout for the specific screen size this is being shared on
+     (iPhone 14/15/16/17 Pro-class, non-Max). Uses a static, hardcoded height
+     rather than 100dvh/window.innerHeight, since iOS standalone home-screen
+     apps have proven unreliable at computing those dynamically. Any other
+     screen size safely falls through to the bounded 42vh scorecard above. */
+  @media (min-width: 390px) and (max-width: 400px) and (min-height: 840px) and (max-height: 860px) {
+    .page {
+      height: 852px; overflow: hidden;
+    }
+    .card-shell-game {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; max-height: none;
+    }
+    .felt-body-game {
+      display: flex; flex-direction: column; flex: 1; min-height: 0;
+    }
+    .dice-roll-area {
+      display: flex; flex-direction: column; flex: 1; min-height: 0;
+    }
+    .card-shell-game .scorecard-box {
+      flex: 1; min-height: 0; max-height: none;
+    }
   }
-  .dice-roll-area {
-    display: flex; flex-direction: column; flex: 1; min-height: 0;
+
+  .rotate-lock {
+    display: none;
+    position: fixed; inset: 0; z-index: 100;
+    background: #0a0a0a;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 40px;
+  }
+  .rotate-lock-inner { color: #EFE6D3; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .rotate-lock-icon { font-size: 48px; margin-bottom: 16px; transform: rotate(90deg); display: inline-block; }
+  .rotate-lock p { font-size: 16px; line-height: 1.5; margin: 0; }
+  @media (orientation: landscape) and (max-height: 500px) {
+    .rotate-lock { display: flex; }
+    .page { display: none; }
   }
 
   .die-btn { width: 58px; height: 58px; position: relative; flex-shrink: 0; }
@@ -97,6 +125,12 @@
 </head>
 <body>
 <div id="root"></div>
+<div class="rotate-lock">
+  <div class="rotate-lock-inner">
+    <div class="rotate-lock-icon">&#128241;</div>
+    <p>Five Dice! is designed for portrait mode.<br>Please rotate your phone back.</p>
+  </div>
+</div>
 
 <script>
 /* ---------- Game data ---------- */
@@ -733,16 +767,6 @@ function render() {
   }
   document.getElementById("root").innerHTML = html;
 }
-
-/* Fixes a known iOS standalone-web-app quirk where 100dvh can leave a gap
-   at the bottom of the screen (Add to Home Screen mode). Measures the real
-   rendered viewport directly instead of trusting the CSS unit. */
-function setAppHeight() {
-  document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
-}
-window.addEventListener('resize', setAppHeight);
-window.addEventListener('orientationchange', setAppHeight);
-setAppHeight();
 
 render();
 </script>
