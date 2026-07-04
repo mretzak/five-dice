@@ -2,7 +2,7 @@
 
 A pass-and-play dice game for 1–3 players, inspired by the classic 2008 "Five Dice!" iOS app. Built as a single self-contained HTML file — no installs, no accounts, no ads.
 
-**[Play it here](#)** ← replace with your GitHub Pages link once it's live
+**[Play it here](https://mretzak.github.io/five-dice/)**
 
 ## Features
 
