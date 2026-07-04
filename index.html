@@ -271,6 +271,19 @@ function clearHighScores() {
   saveHighScores([]);
   render();
 }
+function requestClearHighScores() {
+  if (state.highScores.length === 0) return;
+  state.showConfirmClearScores = true;
+  render();
+}
+function cancelClearHighScores() {
+  state.showConfirmClearScores = false;
+  render();
+}
+function confirmClearHighScores() {
+  state.showConfirmClearScores = false;
+  clearHighScores();
+}
 
 /* ---------- State ---------- */
 const state = {
@@ -291,6 +304,7 @@ const state = {
   highScores: loadHighScores(),
   showHighScores: false,
   showConfirmNewGame: false,
+  showConfirmClearScores: false,
   savedThisGame: false,
   soundOn: true,
 };
@@ -488,7 +502,7 @@ function wallOfFameModalHTML() {
         '<div class="wood" style="max-height:384px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;">' +
           rows +
           '<div style="padding:4px 16px 16px;">' +
-            '<button class="fd-btn" onclick="clearHighScores()" style="width:100%;padding:8px 0;border-radius:6px;font-size:12px;font-weight:bold;background:rgba(0,0,0,0.3);color:#F2E4C8;">Clear list</button>' +
+            '<button class="fd-btn" onclick="requestClearHighScores()" style="width:100%;padding:8px 0;border-radius:6px;font-size:12px;font-weight:bold;background:rgba(0,0,0,0.3);color:#F2E4C8;">Clear list</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -508,6 +522,25 @@ function confirmNewGameModalHTML() {
           '<div style="display:flex;gap:8px;">' +
             '<button class="fd-btn" onclick="cancelNewGame()" style="flex:1;padding:12px 0;border-radius:8px;font-size:14px;font-weight:bold;background:#dcd3bd;color:#3a2a1a;">Keep Playing</button>' +
             '<button class="fd-btn" onclick="confirmNewGame()" style="flex:1;padding:12px 0;border-radius:8px;font-size:14px;font-weight:bold;background:#B4271B;color:#F4EDE1;">Start Over</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function confirmClearScoresModalHTML() {
+  return (
+    '<div class="modal-overlay" onclick="cancelClearHighScores()">' +
+      '<div class="modal-card" onclick="event.stopPropagation()">' +
+        '<div class="wood" style="padding:12px 16px;text-align:center;">' +
+          '<span class="fd-wood-text" style="color:#F2E4C8;font-weight:bold;font-size:18px;">Clear Wall of Fame?</span>' +
+        '</div>' +
+        '<div class="felt" style="padding:24px 20px;">' +
+          '<p style="text-align:center;font-size:14px;color:#DDEFE2;margin:0 0 20px;">This will permanently erase all saved high scores on this device. This can\'t be undone.</p>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="fd-btn" onclick="cancelClearHighScores()" style="flex:1;padding:12px 0;border-radius:8px;font-size:14px;font-weight:bold;background:#dcd3bd;color:#3a2a1a;">Cancel</button>' +
+            '<button class="fd-btn" onclick="confirmClearHighScores()" style="flex:1;padding:12px 0;border-radius:8px;font-size:14px;font-weight:bold;background:#B4271B;color:#F4EDE1;">Clear Scores</button>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -537,6 +570,7 @@ function renderSetupCount() {
         '</div>' +
       '</div>' +
       (state.showHighScores ? wallOfFameModalHTML() : "") +
+      (state.showConfirmClearScores ? confirmClearScoresModalHTML() : "") +
     '</div>'
   );
 }
@@ -644,7 +678,7 @@ function renderGame() {
       if (c.key === "sixes") {
         row += '<div style="padding:6px 12px;font-size:12px;display:flex;justify-content:space-between;background:#efe9da;color:#5c4a30;border-bottom:1px solid rgba(0,0,0,0.08);"><span>Upper bonus (' + totals[turn].upper + '/63)</span><span style="font-weight:bold;">' + totals[turn].bonus + '</span></div>';
       }
-      if (c.key === "yahtzee") {
+      if (c.key === "chance") {
         row += '<div style="padding:6px 12px;font-size:12px;display:flex;justify-content:space-between;background:#efe9da;color:#5c4a30;border-bottom:1px solid rgba(0,0,0,0.08);"><span>Five Dice Bonus (+100 each)</span><span style="font-weight:bold;">' + (state.yahtzeeBonus[turn]*100) + '</span></div>';
       }
       return row;
@@ -678,6 +712,7 @@ function renderGame() {
       '</div>' +
       (state.showHighScores ? wallOfFameModalHTML() : "") +
       (state.showConfirmNewGame ? confirmNewGameModalHTML() : "") +
+      (state.showConfirmClearScores ? confirmClearScoresModalHTML() : "") +
       '<div class="wood bottom-nav">' +
         '<div class="bottom-nav-inner">' +
           '<button class="fd-btn fd-wood-text" onclick="requestNewGame()" style="color:#F2E4C8;font-size:12px;font-weight:bold;display:flex;flex-direction:column;align-items:center;gap:2px;"><span style="font-size:16px;">&#8962;</span>New Game</button>' +
